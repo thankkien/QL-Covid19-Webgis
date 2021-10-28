@@ -127,18 +127,24 @@
         // var_dump($result);
         if ($result != null)
         {
-            $resFin = '<table>';
+            //$resFin = '<table>';
+            $text='';
             // Lặp kết quả
             foreach ($result as $item){
-                if ($paType == 0) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_0'].'</td></tr>';
-                if ($paType == 1) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_1'].', '.$item['name_0'].'</td></tr>';
-                if ($paType == 2) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_2'].', '.$item['name_1'].', '.$item['name_0'].'</td></tr>';
-                if ($paType == 3) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_3'].', '.$item['name_2'].', '.$item['name_1'].', '.$item['name_0'].'</td></tr>';
-                $resFin = $resFin.'<tr><td>Diện Tích: '.$item['dientich'].'</td></tr>';
+                // if ($paType == 0) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_0'].'</td></tr>';
+                // if ($paType == 1) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_1'].', '.$item['name_0'].'</td></tr>';
+                // if ($paType == 2) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_2'].', '.$item['name_1'].', '.$item['name_0'].'</td></tr>';
+                // if ($paType == 3) $resFin = $resFin.'<tr><td>Địa điểm: '.$item['name_3'].', '.$item['name_2'].', '.$item['name_1'].', '.$item['name_0'].'</td></tr>';
+                // $resFin = $resFin.'<tr><td>Diện Tích: '.$item['dientich'].'</td></tr>';
+                if ($paType == 0) $text = '{"nuoc":"'.$item['name_0'].'"}';
+                if ($paType == 1) $text = '{"tinh":"'.$item['name_1'].'", "nuoc":"'.$item['name_0'].'"}';
+                if ($paType == 2) $text = '{"huyen":"'.$item['name_2'].'", "tinh":"'.$item['name_1'].'", "nuoc":"'.$item['name_0'].'"}';
+                if ($paType == 3) $text = '{"xa":"'.$item['name_3'].'", "huyen":"'.$item['name_2'].'", "tinh":"'.$item['name_1'].'", "nuoc":"'.$item['name_0'].'"}';
                 break;
             }
-            $resFin = $resFin.'</table>';
-            return $resFin;
+            //$resFin = $resFin.'</table>';
+            //return $resFin;
+            return $text;
         }
         else
             return "null";

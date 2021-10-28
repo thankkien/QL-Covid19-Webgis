@@ -52,6 +52,12 @@
                 <label for="diachi">Địa chỉ chi tiết</label><br>
                 <input type="text" id="diachi" name="diachi" require><br>
 
+                <label for="xa">Xã/Phường</label><br>
+                <input type="text" id="xa" name="xa" readonly require><br>
+                <label for="huyen">Huyện/Quận</label><br>
+                <input type="text" id="huyen" name="huyen" readonly require><br>
+                <label for="tinh">Tỉnh/Thành Phố</label><br>
+                <input type="text" id="tinh" name="tinh" readonly require><br>
                 <label for="lon">Kinh độ</label><br>
                 <input type="text" id="lon" name="lon" readonly require><br>
                 <label for="lat">Vĩ độ</label><br>
@@ -166,14 +172,47 @@
             });
             map.addLayer(vectorLayer);
 
+            function displayObjInfo(result, coordinate) {
+                //alert("result: " + result);
+                //alert("coordinate des: " + coordinate);
+                
+                // const text = '{"name":"John", "birth":"1986-12-14", "city":"New York"}';
+                const obj = JSON.parse(result);
+
+                document.getElementById("xa").value = obj.xa;
+                document.getElementById("huyen").value = obj.huyen;
+                document.getElementById("tinh").value = obj.tinh;
+                //$("#info").html(result);
+            }
+            
             map.on('singleclick', function(evt) {
                 //alert("coordinate org: " + evt.coordinate);
                 //var myPoint = 'POINT(12,5)';
                 var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
                 var lon = lonlat[0];
                 var lat = lonlat[1];
+                var myPoint = 'POINT(' + lon + ' ' + lat + ')';
                 document.getElementById("lon").value = lon;
                 document.getElementById("lat").value = lat;
+
+                
+                $.ajax({
+                    type: "POST",
+                    url: "VNM_pgsqlAPI.php",
+                    //dataType: 'json',
+                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
+                    data: {
+                        functionname: 'getInfoVNMToAjax',
+                        paPoint: myPoint,
+                        paType: 3
+                    },
+                    success: function(result, status, erro) {
+                        displayObjInfo(result, evt.coordinate);
+                    },
+                    error: function(req, status, error) {
+                        alert(req + " " + status + " " + error);
+                    }
+                });
                 //alert("myPoint: " + myPoint);
                 //*
                 //*/

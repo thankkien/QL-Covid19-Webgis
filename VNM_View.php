@@ -134,22 +134,24 @@
                 return geojsonObject;
             }
 
-            function drawGeoJsonObj(paObjJson) {
-                var vectorSource = new ol.source.Vector({
-                    features: (new ol.format.GeoJSON()).readFeatures(paObjJson, {
-                        dataProjection: 'EPSG:4326',
-                        featureProjection: 'EPSG:3857'
-                    })
-                });
-                var vectorLayer = new ol.layer.Vector({
-                    source: vectorSource
-                });
-                map.addLayer(vectorLayer);
-            }
+            // function drawGeoJsonObj(paObjJson) {
+            //     var vectorSource = new ol.source.Vector({
+            //         features: (new ol.format.GeoJSON()).readFeatures(paObjJson, {
+            //             dataProjection: 'EPSG:4236',
+            //             featureProjection: 'EPSG:3857'
+            //         })
+            //     });
+            //     var vectorLayer = new ol.layer.Vector({
+            //         source: vectorSource
+            //     });
+            //     map.addLayer(vectorLayer);
+            // }
 
             function displayObjInfo(result, coordinate) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
+
+                
                 $("#info").html(result);
             }
 
@@ -176,7 +178,7 @@
                 // alert(strObjJson);
                 var objJson = JSON.parse(strObjJson);
                 // alert(JSON.stringify(objJson));
-                drawGeoJsonObj(objJson);
+                //drawGeoJsonObj(objJson);
                 highLightGeoJsonObj(objJson);
             }
 
