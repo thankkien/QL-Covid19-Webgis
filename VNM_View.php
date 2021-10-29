@@ -13,6 +13,9 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" type="text/javascript"></script>
     <!-- <script src="http://localhost:8081/libs/jquery/jquery-3.4.1.min.js" type="text/javascript"></script> -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     <style>
         .map,
         .righ-panel {
@@ -35,13 +38,17 @@
 </head>
 
 <body onload="initialize_map();">
+    <?php include 'navbar.php' ?>
     <table>
         <tr>
             <td>
                 <div id="map" class="map"></div>
             </td>
             <td>
-                <div id="info"></div>
+                <label for="diaDiem">Địa điểm:</label><br>
+                <input type="text" id="diaDiem" name="diaDiem" readonly require><br>
+                <label for="soLuongBenhNhan">Số bệnh nhân đang điều trị</label><br>
+                <input type="text" id="soLuongBenhNhan" name="soLuongBenhNhan" readonly require><br>
             </td>
         </tr>
     </table>
@@ -147,12 +154,23 @@
             //     map.addLayer(vectorLayer);
             // }
 
-            function displayObjInfo(result, coordinate) {
+            function hienThiTenVung(result, coordinate) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
+                const obj = JSON.parse(result);
+                if (kieulop == 0) document.getElementById("diaDiem").value = obj.nuoc;
+                else if (kieulop == 1) document.getElementById("diaDiem").value = obj.tinh + ", " + obj.nuoc;
+                else if (kieulop == 2) document.getElementById("diaDiem").value = obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
+                else if (kieulop == 3) document.getElementById("diaDiem").value = obj.xa + ", " + obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
+                // document.getElementById("diaDiem").value = result;
+            }
 
-                
-                $("#info").html(result);
+            function hienThiSoLuong(result, coordinate) {
+                //alert("result: " + result);
+                //alert("coordinate des: " + coordinate);
+                const obj = JSON.parse(result);
+                document.getElementById("soLuongBenhNhan").value = obj.soLuong;
+                // document.getElementById("diaDiem").value = result;
             }
 
             function highLightGeoJsonObj(paObjJson) {
@@ -191,18 +209,37 @@
                 var myPoint = 'POINT(' + lon + ' ' + lat + ')';
                 // alert("myPoint: " + myPoint);
 
+
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
                     //dataType: 'json',
                     //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
-                        functionname: 'getInfoVNMToAjax',
+                        functionname: 'layTenVung',
                         paPoint: myPoint,
                         paType: kieulop
                     },
                     success: function(result, status, erro) {
-                        displayObjInfo(result, evt.coordinate);
+                        hienThiTenVung(result, evt.coordinate);
+                    },
+                    error: function(req, status, error) {
+                        alert(req + " " + status + " " + error);
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "VNM_pgsqlAPI.php",
+                    //dataType: 'json',
+                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
+                    data: {
+                        functionname: 'laySoLuongBenhNhan',
+                        paPoint: myPoint,
+                        paType: kieulop
+                    },
+                    success: function(result, status, erro) {
+                        hienThiSoLuong(result, evt.coordinate);
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
@@ -229,6 +266,8 @@
             });
         };
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 
 </html>
