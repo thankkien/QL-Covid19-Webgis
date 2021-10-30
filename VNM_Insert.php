@@ -11,7 +11,7 @@
     <!-- <link rel="stylesheet" href="http://localhost:8081/libs/openlayers/css/ol.css" type="text/css" />
         <script src="http://localhost:8081/libs/openlayers/build/ol.js" type="text/javascript"></script> -->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" type="text/javascript"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" type="text/javascript"></script>
     <!-- <script src="http://localhost:8081/libs/jquery/jquery-3.4.1.min.js" type="text/javascript"></script> -->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -153,21 +153,36 @@
             });
             map = new ol.Map({
                 target: "map",
+                //layers: [layerBG],
                 //layers: [layerGADM_VNM],
                 layers: [layerBG, layerGADM_VNM],
                 view: viewMap
             });
             //map.getView().fit(bounds, map.getSize());
-            var styles = {
-                'MultiPolygon': new ol.style.Style({
+
+            var styleFunction = function(feature) {
+                return [new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'orange'
+                    }),
                     stroke: new ol.style.Stroke({
                         color: 'yellow',
                         width: 2
+                    }),
+                    text: new ol.style.Text({
+                        font: '12px Calibri,sans-serif',
+                        fill: new ol.style.Fill({
+                            color: '#000'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#fff',
+                            width: 2
+                        }),
+                        // get the text from the feature - `this` is ol.Feature
+                        // and show only under certain resolution
+                        text: feature.get('name') //'example'//this.get('description')
                     })
-                })
-            };
-            var styleFunction = function(feature) {
-                return styles[feature.getGeometry().getType()];
+                })]
             };
             var vectorLayer = new ol.layer.Vector({
                 //source: vectorSource,
@@ -175,11 +190,20 @@
             });
             map.addLayer(vectorLayer);
 
+            function hienThiDiem(lon, lat) {
+                var geoJson = '{"type": "Feature","geometry": {"type": "Point","coordinates": [' + lon + ', ' + lat + ']},"properties": {"name": "Dinagat Islands"}}'
+                var vectorSource = new ol.source.Vector({
+                    features: (new ol.format.GeoJSON()).readFeatures(geoJson, {
+                        dataProjection: 'EPSG:4326',
+                        featureProjection: 'EPSG:3857',
+                    })
+                });
+                vectorLayer.setSource(vectorSource);
+            }
+
             function hienThiThongTin(result, coordinate) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
-
-                // const text = '{"name":"John", "birth":"1986-12-14", "city":"New York"}';
                 const obj = JSON.parse(result);
 
                 document.getElementById("xa").value = obj.xa;
@@ -191,10 +215,13 @@
             map.on('singleclick', function(evt) {
                 //alert("coordinate org: " + evt.coordinate);
                 //var myPoint = 'POINT(12,5)';
+
                 var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
                 var lon = lonlat[0];
                 var lat = lonlat[1];
                 var myPoint = 'POINT(' + lon + ' ' + lat + ')';
+
+                hienThiDiem(lon, lat);
                 document.getElementById("lon").value = lon;
                 document.getElementById("lat").value = lat;
 

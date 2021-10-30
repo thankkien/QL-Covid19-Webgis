@@ -105,9 +105,6 @@
             });
             //map.getView().fit(bounds, map.getSize());
 
-            // var styles = {
-            //     'MultiPolygon': 
-            // };
             var styleFunction = function(feature) {
                 return [new ol.style.Style({
                     fill: new ol.style.Fill({
@@ -128,7 +125,7 @@
                         }),
                         // get the text from the feature - `this` is ol.Feature
                         // and show only under certain resolution
-                        text:  feature.get('name') //'example'//this.get('description')
+                        text: feature.get('name') //'example'//this.get('description')
                     })
                 })]
             };
@@ -139,8 +136,9 @@
             map.addLayer(vectorLayer);
 
             function createJsonObj(result) {
-                var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":'+result+']}';
-                return geojsonObject;
+                var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":' + result + ']}';
+                return geojsonObject; 
+                //return '{"type": "Feature","geometry": {"type": "Point","coordinates": [105, 21]},"properties": {"name": "Dinagat Islands"}}'
             }
 
             // function drawGeoJsonObj(paObjJson) {
