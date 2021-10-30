@@ -119,25 +119,25 @@ function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType)
     //echo $paPoint;
     $paPoint = str_replace(',', ' ', $paPoint);
     if ($paType == 0)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong
-                    FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_0\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung
-                    WHERE benhnhan.tinhtrang = 1 AND
-                        ST_Within(benhnhan.geom, vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
+                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_0\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
+                    "WHERE benhnhan.tinhtrang = 1 AND ".
+                        "ST_Within(benhnhan.geom, vung.geom);";
     else if ($paType == 1)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong
-                    FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_1\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung
-                    WHERE benhnhan.tinhtrang = 1 AND
-                        ST_Within(benhnhan.geom, vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
+                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_1\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
+                    "WHERE benhnhan.tinhtrang = 1 AND ".
+                        "ST_Within(benhnhan.geom, vung.geom);";
     else if ($paType == 2)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong
-                    FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_2\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung
-                    WHERE benhnhan.tinhtrang = 1 AND
-                        ST_Within(benhnhan.geom, vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
+                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_2\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
+                    "WHERE benhnhan.tinhtrang = 1 AND ".
+                        "ST_Within(benhnhan.geom, vung.geom);";
     else if ($paType == 3)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong
-                    FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_3\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung
-                    WHERE benhnhan.tinhtrang = 1 AND
-                        ST_Within(benhnhan.geom, vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
+                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_3\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
+                    "WHERE benhnhan.tinhtrang = 1 AND ".
+                        "ST_Within(benhnhan.geom, vung.geom);";
     // echo $mySQLStr;
     $result = query($paPDO, $mySQLStr);
     // var_dump($result);

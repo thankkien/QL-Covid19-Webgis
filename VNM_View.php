@@ -96,6 +96,7 @@
                 zoom: mapDefaultZoom
                 //projection: projection
             });
+
             map = new ol.Map({
                 target: "map",
                 //layers: [layerGADM_VNM],
@@ -104,19 +105,32 @@
             });
             //map.getView().fit(bounds, map.getSize());
 
-            var styles = {
-                'MultiPolygon': new ol.style.Style({
+            // var styles = {
+            //     'MultiPolygon': 
+            // };
+            var styleFunction = function(feature) {
+                return [new ol.style.Style({
                     fill: new ol.style.Fill({
                         color: 'orange'
                     }),
                     stroke: new ol.style.Stroke({
                         color: 'yellow',
                         width: 2
+                    }),
+                    text: new ol.style.Text({
+                        font: '12px Calibri,sans-serif',
+                        fill: new ol.style.Fill({
+                            color: '#000'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#fff',
+                            width: 2
+                        }),
+                        // get the text from the feature - `this` is ol.Feature
+                        // and show only under certain resolution
+                        text:  feature.get('name') //'example'//this.get('description')
                     })
-                })
-            };
-            var styleFunction = function(feature) {
-                return styles[feature.getGeometry().getType()];
+                })]
             };
             var vectorLayer = new ol.layer.Vector({
                 //source: vectorSource,
@@ -125,19 +139,7 @@
             map.addLayer(vectorLayer);
 
             function createJsonObj(result) {
-                var geojsonObject = '{' +
-                    '"type": "FeatureCollection",' +
-                    '"crs": {' +
-                    '"type": "name",' +
-                    '"properties": {' +
-                    '"name": "EPSG:4326"' +
-                    '}' +
-                    '},' +
-                    '"features": [{' +
-                    '"type": "Feature",' +
-                    '"geometry": ' + result +
-                    '}]' +
-                    '}';
+                var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":{"name":"aaaa"}, "geometry":'+result+'}]}';
                 return geojsonObject;
             }
 
@@ -177,7 +179,7 @@
                 var vectorSource = new ol.source.Vector({
                     features: (new ol.format.GeoJSON()).readFeatures(paObjJson, {
                         dataProjection: 'EPSG:4326',
-                        featureProjection: 'EPSG:3857'
+                        featureProjection: 'EPSG:3857',
                     })
                 });
                 vectorLayer.setSource(vectorSource);
@@ -193,7 +195,8 @@
                 // console.log("result: " + result);
 
                 var strObjJson = createJsonObj(result);
-                // alert(strObjJson);
+                console.log(strObjJson)
+                //alert(strObjJson);
                 var objJson = JSON.parse(strObjJson);
                 // alert(JSON.stringify(objJson));
                 //drawGeoJsonObj(objJson);
