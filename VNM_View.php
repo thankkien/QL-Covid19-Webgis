@@ -85,7 +85,7 @@
                     params: {
                         'FORMAT': format,
                         'VERSION': '1.1.1',
-                        STYLES: '',
+                        STYLES: 'line',
                         LAYERS: lop,
                     }
                 })
@@ -139,7 +139,7 @@
             map.addLayer(vectorLayer);
 
             function createJsonObj(result) {
-                var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":{"name":"aaaa"}, "geometry":'+result+'}]}';
+                var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":'+result+']}';
                 return geojsonObject;
             }
 
@@ -195,7 +195,7 @@
                 // console.log("result: " + result);
 
                 var strObjJson = createJsonObj(result);
-                console.log(strObjJson)
+                //console.log(strObjJson)
                 //alert(strObjJson);
                 var objJson = JSON.parse(strObjJson);
                 // alert(JSON.stringify(objJson));

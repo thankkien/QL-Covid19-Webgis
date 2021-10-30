@@ -94,13 +94,13 @@ function getGeoVNMToAjax($paPDO, $paSRID, $paPoint, $paType)
     //echo "<br>";
     //$mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"VNM_adm1\" where ST_Within('SRID=4326;POINT(12 5)'::geometry,geom)";
     if ($paType == 0)
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm36_vnm_0\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
+        $mySQLStr = "SELECT name_0 AS tenvung, ST_AsGeoJson(geom) AS geo from \"gadm36_vnm_0\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
     else if ($paType == 1)
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm36_vnm_1\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
+        $mySQLStr = "SELECT name_1 AS tenvung, ST_AsGeoJson(geom) AS geo from \"gadm36_vnm_1\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
     else if ($paType == 2)
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm36_vnm_2\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
+        $mySQLStr = "SELECT name_2 AS tenvung, ST_AsGeoJson(geom) AS geo from \"gadm36_vnm_2\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
     else if ($paType == 3)
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm36_vnm_3\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
+        $mySQLStr = "SELECT name_3 AS tenvung, ST_AsGeoJson(geom) AS geo from \"gadm36_vnm_3\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)";
     //echo $mySQLStr;
     //echo "<br><br>";
     $result = query($paPDO, $mySQLStr);
@@ -108,7 +108,7 @@ function getGeoVNMToAjax($paPDO, $paSRID, $paPoint, $paType)
     if ($result != null) {
         // Lặp kết quả
         foreach ($result as $item) {
-            return $item['geo'];
+            return '{"name":"'.$item["tenvung"].'"}, "geometry":'.$item["geo"].'}';
         }
     } else
         return "null";
