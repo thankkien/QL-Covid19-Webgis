@@ -15,7 +15,7 @@
     <!-- <script src="http://localhost:8081/libs/jquery/jquery-3.4.1.min.js" type="text/javascript"></script> -->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
     <style>
         .map,
         .righ-panel {
@@ -26,7 +26,7 @@
 
         .map,
         .righ-panel {
-            height: 98vh;
+            height: 85vh;
             width: 80vw;
             float: left;
         }
@@ -39,19 +39,52 @@
 
 <body onload="initialize_map();">
     <?php include 'navbar.php' ?>
-    <table>
-        <tr>
-            <td>
-                <div id="map" class="map"></div>
-            </td>
-            <td>
-                <label for="diaDiem">Địa điểm:</label><br>
-                <input type="text" id="diaDiem" name="diaDiem" readonly require><br>
-                <label for="soLuongBenhNhan">Số bệnh nhân đang điều trị</label><br>
-                <input type="text" id="soLuongBenhNhan" name="soLuongBenhNhan" readonly require><br>
-            </td>
-        </tr>
-    </table>
+
+    <div class="row">
+        <div class="col">
+            <form action="" method="GET" class="row">
+                <div class="col">
+                    <select name="style" class="custom-select">
+                        <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 0) ? "selected" : " " ?> value="0">polygon</option>
+                        <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 1) ? "selected" : " " ?> value="1">line</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="layerview" class="custom-select">
+                        <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 0) ? "selected" : " " ?> value="0">Việt Nam</option>
+                        <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 1) ? "selected" : " " ?> value="1">Tỉnh/Thành Phố</option>
+                        <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 2) ? "selected" : " " ?> value="2">Quận/Huyện</option>
+                        <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 3) ? "selected" : " " ?> value="3">Xã/Phường</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button class="btn btn-danger" type="submit">Chọn</button>
+                </div>
+            </form>
+            <form>
+                <div class="form-group">
+                    <label for="diaDiem">Địa điểm:</label><br>
+                    <input type="text" id="diaDiem" name="diaDiem" readonly require><br>
+                </div>
+                <div class="form-group">
+                    <label for="soLuongBenhNhan">Số bệnh nhân đang điều trị</label><br>
+                    <input type="text" id="soLuongBenhNhan" name="soLuongBenhNhan" readonly require><br>
+                </div>
+                <div class="form-group">
+                    <label for="soLuongDaKhoi">Số bệnh nhân đã khỏi bệnh</label><br>
+                    <input type="text" id="soLuongDaKhoi" name="soLuongDaKhoi" readonly require><br>
+                </div>
+                <div class="form-group">
+                    <label for="soLuongTuVong">Số bệnh nhân đã tử vong</label><br>
+                    <input type="text" id="soLuongTuVong" name="soLuongTuVong" readonly require><br>
+                </div>
+            </form>
+        </div>
+        <div class="col-9">
+            <div id="map" class="map"></div>
+        </div>
+    </div>
+
     <?php include 'VNM_pgsqlAPI.php' ?>
     <script>
         var format = 'image/png';
@@ -65,32 +98,40 @@
         var mapLat = cenY;
         var mapLng = cenX;
         var mapDefaultZoom = 6;
-        var kieulop = <?php if (isset($_GET['layerview'])) echo $_GET['layerview'];
-                        else echo "0"; ?>;
-        var lop = 'gadm36_vnm_0';
-        if (kieulop == 1) lop = 'gadm36_vnm_1';
-        else if (kieulop == 2) lop = 'gadm36_vnm_2';
-        else if (kieulop == 3) lop = 'gadm36_vnm_3';
+        var makieu = <?php echo (isset($_GET['style'])) ? $_GET['style'] :  "0"; ?>;
+        var malop = <?php echo (isset($_GET['layerview'])) ? $_GET['layerview'] :  "0"; ?>;
+
+        function layKieu(makieu) {
+            if (makieu == 1) return "line";
+            else return "polygon"
+        };
+
+        function layLop(malop) {
+            if (malop == 1) return "gadm36_vnm_1";
+            else if (malop == 2) return "gadm36_vnm_2";
+            else if (malop == 3) return "gadm36_vnm_3";
+            else return "gadm36_vnm_0"
+        };
 
         function initialize_map() {
             layerBG = new ol.layer.Tile({
                 source: new ol.source.OSM({})
             });
-
+            var port = '8080';
             var workspaces = 'chaythu';
             var layerGADM_VNM = new ol.layer.Image({
                 source: new ol.source.ImageWMS({
                     ratio: 1,
-                    url: 'http://localhost:8080/geoserver/' + workspaces + '/wms?',
+                    url: 'http://localhost:' + port + '/geoserver/' + workspaces + '/wms?',
                     params: {
                         'FORMAT': format,
                         'VERSION': '1.1.1',
-                        STYLES: 'line',
-                        LAYERS: lop,
+                        STYLES: layKieu(makieu),
+                        LAYERS: layLop(malop),
                     }
                 })
             });
-
+            //console.log(makieu + ":" + layKieu(makieu) + "; " + malop + layLop(malop));
             var viewMap = new ol.View({
                 center: ol.proj.fromLonLat([mapLng, mapLat]),
                 zoom: mapDefaultZoom
@@ -137,7 +178,7 @@
 
             function createJsonObj(result) {
                 var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":' + result + ']}';
-                return geojsonObject; 
+                return geojsonObject;
                 //return '{"type": "Feature","geometry": {"type": "Point","coordinates": [105, 21]},"properties": {"name": "Dinagat Islands"}}'
             }
 
@@ -158,19 +199,29 @@
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
                 const obj = JSON.parse(result);
-                if (kieulop == 0) document.getElementById("diaDiem").value = obj.nuoc;
-                else if (kieulop == 1) document.getElementById("diaDiem").value = obj.tinh + ", " + obj.nuoc;
-                else if (kieulop == 2) document.getElementById("diaDiem").value = obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
-                else if (kieulop == 3) document.getElementById("diaDiem").value = obj.xa + ", " + obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
+                if (malop == 0) document.getElementById("diaDiem").value = obj.nuoc;
+                else if (malop == 1) document.getElementById("diaDiem").value = obj.tinh + ", " + obj.nuoc;
+                else if (malop == 2) document.getElementById("diaDiem").value = obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
+                else if (malop == 3) document.getElementById("diaDiem").value = obj.xa + ", " + obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
                 // document.getElementById("diaDiem").value = result;
             }
 
-            function hienThiSoLuong(result, coordinate) {
-                //alert("result: " + result);
-                //alert("coordinate des: " + coordinate);
+            function hienThiSoBenhNhan(result, coordinate) {
+                // console.log(result);
                 const obj = JSON.parse(result);
                 document.getElementById("soLuongBenhNhan").value = obj.soLuong;
-                // document.getElementById("diaDiem").value = result;
+            }
+
+            function hienThiSoDaKhoi(result, coordinate) {
+                // console.log(result);
+                const obj = JSON.parse(result);
+                document.getElementById("soLuongDaKhoi").value = obj.soLuong;
+            }
+
+            function hienThiSoTuVong(result, coordinate) {
+                // console.log(result);
+                const obj = JSON.parse(result);
+                document.getElementById("soLuongTuVong").value = obj.soLuong;
             }
 
             function highLightGeoJsonObj(paObjJson) {
@@ -219,7 +270,7 @@
                     data: {
                         functionname: 'layTenVung',
                         paPoint: myPoint,
-                        paType: kieulop
+                        paType: malop
                     },
                     success: function(result, status, erro) {
                         hienThiTenVung(result, evt.coordinate);
@@ -237,10 +288,49 @@
                     data: {
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
-                        paType: kieulop
+                        paType: malop,
+                        tinhTrang: 0
                     },
                     success: function(result, status, erro) {
-                        hienThiSoLuong(result, evt.coordinate);
+                        hienThiSoDaKhoi(result, evt.coordinate);
+                    },
+                    error: function(req, status, error) {
+                        alert(req + " " + status + " " + error);
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "VNM_pgsqlAPI.php",
+                    //dataType: 'json',
+                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
+                    data: {
+                        functionname: 'laySoLuongBenhNhan',
+                        paPoint: myPoint,
+                        paType: malop,
+                        tinhTrang: 1
+                    },
+                    success: function(result, status, erro) {
+                        hienThiSoBenhNhan(result, evt.coordinate);
+                    },
+                    error: function(req, status, error) {
+                        alert(req + " " + status + " " + error);
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "VNM_pgsqlAPI.php",
+                    //dataType: 'json',
+                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
+                    data: {
+                        functionname: 'laySoLuongBenhNhan',
+                        paPoint: myPoint,
+                        paType: malop,
+                        tinhTrang: 2
+                    },
+                    success: function(result, status, erro) {
+                        hienThiSoTuVong(result, evt.coordinate);
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
@@ -255,7 +345,7 @@
                     data: {
                         functionname: 'getGeoVNMToAjax',
                         paPoint: myPoint,
-                        paType: kieulop
+                        paType: malop
                     },
                     success: function(result, status, erro) {
                         highLightObj(result);

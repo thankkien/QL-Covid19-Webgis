@@ -17,8 +17,9 @@ if (isset($_POST['functionname'])) {
         $aResult = layTenVung($paPDO, $paSRID, $paPoint, $paType);
     } else if ($functionname == 'laySoLuongBenhNhan') {
         $paType = isset($_POST['paType']) ? $_POST['paType'] : '';
+        $tinhTrang = isset($_POST['tinhTrang']) ? $_POST['tinhTrang'] : '';
 
-        $aResult = laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType);
+        $aResult = laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang);
     } else if ($functionname == 'themVaoCSDL') {
         $hoten = isset($_POST['hoten']) ? $_POST['hoten'] : '';
         $ngaysinh = isset($_POST['ngaysinh']) ? $_POST['ngaysinh'] : '';
@@ -114,33 +115,32 @@ function getGeoVNMToAjax($paPDO, $paSRID, $paPoint, $paType)
         return "null";
 }
 
-function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType)
+function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang)
 {
     //echo $paPoint;
     $paPoint = str_replace(',', ' ', $paPoint);
     if ($paType == 0)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
                     "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_0\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = 1 AND ".
-                        "ST_Within(benhnhan.geom, vung.geom);";
+                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
+                        "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 1)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
                     "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_1\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = 1 AND ".
-                        "ST_Within(benhnhan.geom, vung.geom);";
+                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
+                        "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 2)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
                     "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_2\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = 1 AND ".
-                        "ST_Within(benhnhan.geom, vung.geom);";
+                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
+                        "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 3)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
                     "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_3\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = 1 AND ".
-                        "ST_Within(benhnhan.geom, vung.geom);";
+                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
+                        "ST_Intersects( benhnhan.geom::geometry,vung.geom);";
     // echo $mySQLStr;
     $result = query($paPDO, $mySQLStr);
-    // var_dump($result);
     if ($result != null)
     {
         $textJson='';
@@ -153,7 +153,7 @@ function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType)
     }
     else
         return "null";
-    // return $mySQLStr;
+    //return $mySQLStr;
 }
 
 function layTenVung($paPDO, $paSRID, $paPoint, $paType)
