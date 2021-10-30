@@ -146,7 +146,7 @@
             });
             //map.getView().fit(bounds, map.getSize());
 
-            var styleFunction = function(feature) {
+            var stylePolygon = function(feature) {
                 return [new ol.style.Style({
                     fill: new ol.style.Fill({
                         color: 'orange'
@@ -170,40 +170,55 @@
                     })
                 })]
             };
-            var vectorLayer = new ol.layer.Vector({
+            var vectorPolygon = new ol.layer.Vector({
                 //source: vectorSource,
-                style: styleFunction
+                style: stylePolygon
             });
-            map.addLayer(vectorLayer);
+            map.addLayer(vectorPolygon);
 
-            function createJsonObj(result) {
+            function createJsonPolygonObj(result) {
                 var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":' + result + ']}';
                 return geojsonObject;
                 //return '{"type": "Feature","geometry": {"type": "Point","coordinates": [105, 21]},"properties": {"name": "Dinagat Islands"}}'
             }
 
-            // function drawGeoJsonObj(paObjJson) {
-            //     var vectorSource = new ol.source.Vector({
-            //         features: (new ol.format.GeoJSON()).readFeatures(paObjJson, {
-            //             dataProjection: 'EPSG:4236',
-            //             featureProjection: 'EPSG:3857'
-            //         })
-            //     });
-            //     var vectorLayer = new ol.layer.Vector({
-            //         source: vectorSource
-            //     });
-            //     map.addLayer(vectorLayer);
-            // }
+
+            var stylePoint = function(feature) {
+                return [new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 3,
+                        fill: new ol.style.Fill({
+                            color: 'red'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: "red",
+                            width: 1
+                        })
+                    }),
+                })]
+            };
+            var vectorPoint = new ol.layer.Vector({
+                style: stylePoint,
+            });
+            map.addLayer(vectorPoint);
+
+            function createJsonPointObj(result) {
+                // alert(result);
+                var geojsonObject = '{"type": "FeatureCollection", "features": [' + result + ']}';
+                return geojsonObject;
+            }
 
             function hienThiTenVung(result, coordinate) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
-                const obj = JSON.parse(result);
-                if (malop == 0) document.getElementById("diaDiem").value = obj.nuoc;
-                else if (malop == 1) document.getElementById("diaDiem").value = obj.tinh + ", " + obj.nuoc;
-                else if (malop == 2) document.getElementById("diaDiem").value = obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
-                else if (malop == 3) document.getElementById("diaDiem").value = obj.xa + ", " + obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
-                // document.getElementById("diaDiem").value = result;
+                if (result != "null") {
+                    const obj = JSON.parse(result);
+                    if (malop == 0) document.getElementById("diaDiem").value = obj.nuoc;
+                    else if (malop == 1) document.getElementById("diaDiem").value = obj.tinh + ", " + obj.nuoc;
+                    else if (malop == 2) document.getElementById("diaDiem").value = obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
+                    else if (malop == 3) document.getElementById("diaDiem").value = obj.xa + ", " + obj.huyen + ", " + obj.tinh + ", " + obj.nuoc;
+                } else
+                    document.getElementById("diaDiem").value = "";
             }
 
             function hienThiSoBenhNhan(result, coordinate) {
@@ -224,32 +239,32 @@
                 document.getElementById("soLuongTuVong").value = obj.soLuong;
             }
 
-            function highLightGeoJsonObj(paObjJson) {
-                var vectorSource = new ol.source.Vector({
-                    features: (new ol.format.GeoJSON()).readFeatures(paObjJson, {
-                        dataProjection: 'EPSG:4326',
-                        featureProjection: 'EPSG:3857',
-                    })
-                });
-                vectorLayer.setSource(vectorSource);
-
-                // var vectorLayer = new ol.layer.Vector({
-                //     source: vectorSource
-                // });
-                // map.addLayer(vectorLayer);
-
+            function highLightObj(result) {
+                // console.log("result: " + result);\
+                if (result != "null") {
+                    var strObjJson = createJsonPolygonObj(result);
+                    var objJson = JSON.parse(strObjJson);
+                    var vectorSource = new ol.source.Vector({
+                        features: (new ol.format.GeoJSON()).readFeatures(objJson, {
+                            dataProjection: 'EPSG:4326',
+                            featureProjection: 'EPSG:3857',
+                        })
+                    });
+                    vectorPolygon.setSource(vectorSource);
+                } else vectorPolygon.setSource(vectorSource);
             }
 
-            function highLightObj(result) {
-                // console.log("result: " + result);
-
-                var strObjJson = createJsonObj(result);
-                //console.log(strObjJson)
-                //alert(strObjJson);
-                var objJson = JSON.parse(strObjJson);
-                // alert(JSON.stringify(objJson));
-                //drawGeoJsonObj(objJson);
-                highLightGeoJsonObj(objJson);
+            function hienThiViTriBenhNhan(result, coordinate) {
+                if (result != "null") {
+                    var geoJson = createJsonPointObj(result);
+                    var vectorSource = new ol.source.Vector({
+                        features: (new ol.format.GeoJSON()).readFeatures(geoJson, {
+                            dataProjection: 'EPSG:4326',
+                            featureProjection: 'EPSG:3857',
+                        })
+                    });
+                    vectorPoint.setSource(vectorSource);
+                } else vectorPoint.setSource(vectorSource);
             }
 
             map.on('singleclick', function(evt) {
@@ -331,6 +346,23 @@
                     },
                     success: function(result, status, erro) {
                         hienThiSoTuVong(result, evt.coordinate);
+                    },
+                    error: function(req, status, error) {
+                        alert(req + " " + status + " " + error);
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "VNM_pgsqlAPI.php",
+                    data: {
+                        functionname: 'layViTriBenhNhan',
+                        paPoint: myPoint,
+                        paType: malop
+                    },
+                    success: function(result, status, erro) {
+                        //console.log(result);
+                        hienThiViTriBenhNhan(result);
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);

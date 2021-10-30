@@ -4,9 +4,7 @@ if (isset($_POST['functionname'])) {
     $paSRID = '4326';
     $functionname = $_POST['functionname'];
     $paPoint = isset($_POST['paPoint']) ? $_POST['paPoint'] : '';
-
     $aResult = "null";
-
     if ($functionname == 'getGeoVNMToAjax') {
         $paType = isset($_POST['paType']) ? $_POST['paType'] : '';
 
@@ -20,6 +18,10 @@ if (isset($_POST['functionname'])) {
         $tinhTrang = isset($_POST['tinhTrang']) ? $_POST['tinhTrang'] : '';
 
         $aResult = laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang);
+    } else if ($functionname == 'layViTriBenhNhan') {
+        $paType = isset($_POST['paType']) ? $_POST['paType'] : '';
+
+        $aResult = layViTriBenhNhan($paPDO, $paSRID, $paPoint, $paType);
     } else if ($functionname == 'themVaoCSDL') {
         $hoten = isset($_POST['hoten']) ? $_POST['hoten'] : '';
         $ngaysinh = isset($_POST['ngaysinh']) ? $_POST['ngaysinh'] : '';
@@ -29,9 +31,7 @@ if (isset($_POST['functionname'])) {
 
         $aResult = themVaoCSDL($paPDO, $paSRID, $hoten, $ngaysinh, $diachi, $cccd, $paPoint);
     }
-
     echo $aResult;
-
     closeDB($paPDO);
 }
 
@@ -109,7 +109,7 @@ function getGeoVNMToAjax($paPDO, $paSRID, $paPoint, $paType)
     if ($result != null) {
         // Lặp kết quả
         foreach ($result as $item) {
-            return '{"name":"'.$item["tenvung"].'"}, "geometry":'.$item["geo"].'}';
+            return '{"name":"' . $item["tenvung"] . '"}, "geometry":' . $item["geo"] . '}';
         }
     } else
         return "null";
@@ -120,38 +120,36 @@ function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang)
     //echo $paPoint;
     $paPoint = str_replace(',', ' ', $paPoint);
     if ($paType == 0)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
-                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_0\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
-                        "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
+            "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_0\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
+            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 1)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
-                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_1\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
-                        "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
+            "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_1\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
+            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 2)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
-                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_2\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
-                        "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
+            "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_2\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
+            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 3)
-        $mySQLStr = "SELECT Count(benhnhan.id) as soluong ".
-                    "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_3\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung ".
-                    "WHERE benhnhan.tinhtrang = ".$tinhTrang." AND ".
-                        "ST_Intersects( benhnhan.geom::geometry,vung.geom);";
+        $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
+            "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_3\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
+            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "ST_Intersects( benhnhan.geom::geometry,vung.geom);";
     // echo $mySQLStr;
     $result = query($paPDO, $mySQLStr);
-    if ($result != null)
-    {
-        $textJson='';
+    if ($result != null) {
+        $textJson = '';
         // Lặp kết quả
-        foreach ($result as $item){
+        foreach ($result as $item) {
             $textJson = '{"soLuong":"' . $item['soluong'] . '"}';
             return $textJson;
             break;
         }
-    }
-    else
+    } else
         return "null";
     //return $mySQLStr;
 }
@@ -182,6 +180,39 @@ function layTenVung($paPDO, $paSRID, $paPoint, $paType)
             return $textJson;
             break;
         }
+    } else
+        return "null";
+}
+
+function layViTriBenhNhan($paPDO, $paSRID, $paPoint, $paType)
+{
+    //echo $paPoint;
+    $paPoint = str_replace(',', ' ', $paPoint);
+    //echo $paPoint;
+    if ($paType == 0)
+        $mySQLStr = "SELECT benhnhan.id as id,  ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_0.geom  from \"gadm36_vnm_0\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
+        where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = 1";
+    else if ($paType == 1)
+        $mySQLStr = "SELECT benhnhan.id as id, ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_1.geom  from \"gadm36_vnm_1\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
+    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = 1";
+    else if ($paType == 2)
+        $mySQLStr = "SELECT benhnhan.id as id,  ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_2.geom  from \"gadm36_vnm_2\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
+    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = 1";
+    else if ($paType == 3)
+        $mySQLStr = "SELECT benhnhan.id as id,  ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_3.geom  from \"gadm36_vnm_3\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
+    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = 1";
+    //echo $mySQLStr;
+    $result = query($paPDO, $mySQLStr);
+    $row =  count($result);
+
+    if ($result != null) {
+        $kq = "";
+        for ($i = 0; $i < $row; $i++) {
+            $item = $result[$i];
+            $kq = $kq . '{"type": "Feature", "properties": { "id": "' . $item['id'] . '" }, "geometry": ' . $item["vitribenhnhan"] . '}';
+            if ($i < $row - 1) $kq = $kq . ',';
+        }
+        return $kq;
     } else
         return "null";
 }

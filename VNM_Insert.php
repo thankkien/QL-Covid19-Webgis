@@ -102,7 +102,7 @@
                 <button class="btn btn-danger" type="add" id="add" onclick="insertData()">Thêm bệnh nhân</button>
             </form>
         </div>
-        <div class="col-9" >
+        <div class="col-9">
             <div id="map" class="map"></div>
         </div>
     </div>
@@ -249,11 +249,18 @@
             function hienThiThongTin(result, coordinate) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
-                const obj = JSON.parse(result);
+                if (result != "null") {
+                    const obj = JSON.parse(result);
+                    document.getElementById("xa").value = obj.xa;
+                    document.getElementById("huyen").value = obj.huyen;
+                    document.getElementById("tinh").value = obj.tinh;
 
-                document.getElementById("xa").value = obj.xa;
-                document.getElementById("huyen").value = obj.huyen;
-                document.getElementById("tinh").value = obj.tinh;
+                } else {
+                    document.getElementById("xa").value = "";
+                    document.getElementById("huyen").value = "";
+                    document.getElementById("tinh").value = "";
+
+                }
                 //$("#info").html(result);
             }
 
