@@ -61,6 +61,13 @@
                     <button class="btn btn-danger" type="submit">Chọn</button>
                 </div>
             </form>
+            <div>
+                <select id="chonBenhNhan" class="custom-select">
+                    <option selected value="0">Đã khỏi</option>
+                    <option value="1">Bệnh nhân</option>
+                    <option value="2">Đã tử vong</option>
+                </select>
+            </div>
             <form>
                 <div class="form-group">
                     <label for="diaDiem">Địa điểm:</label><br>
@@ -176,13 +183,6 @@
             });
             map.addLayer(vectorPolygon);
 
-            function createJsonPolygonObj(result) {
-                var geojsonObject = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":' + result + ']}';
-                return geojsonObject;
-                //return '{"type": "Feature","geometry": {"type": "Point","coordinates": [105, 21]},"properties": {"name": "Dinagat Islands"}}'
-            }
-
-
             var stylePoint = function(feature) {
                 return [new ol.style.Style({
                     image: new ol.style.Circle({
@@ -202,16 +202,10 @@
             });
             map.addLayer(vectorPoint);
 
-            function createJsonPointObj(result) {
-                // alert(result);
-                var geojsonObject = '{"type": "FeatureCollection", "features": [' + result + ']}';
-                return geojsonObject;
-            }
-
             function hienThiTenVung(result, coordinate) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
-                if (result != "null") {
+                if (result != null) {
                     const obj = JSON.parse(result);
                     if (malop == 0) document.getElementById("diaDiem").value = obj.nuoc;
                     else if (malop == 1) document.getElementById("diaDiem").value = obj.tinh + ", " + obj.nuoc;
@@ -239,10 +233,10 @@
                 document.getElementById("soLuongTuVong").value = obj.soLuong;
             }
 
-            function highLightObj(result) {
+            function hienThiVung(result) {
                 // console.log("result: " + result);\
-                if (result != "null") {
-                    var strObjJson = createJsonPolygonObj(result);
+                if (result != null) {
+                    var strObjJson = '{"type": "FeatureCollection", "features": [{"type": "Feature", "properties":' + result + ']}';
                     var objJson = JSON.parse(strObjJson);
                     var vectorSource = new ol.source.Vector({
                         features: (new ol.format.GeoJSON()).readFeatures(objJson, {
@@ -255,8 +249,8 @@
             }
 
             function hienThiViTriBenhNhan(result, coordinate) {
-                if (result != "null") {
-                    var geoJson = createJsonPointObj(result);
+                if (result != null) {
+                    var geoJson = '{"type": "FeatureCollection", "features": [' + result + ']}';
                     var vectorSource = new ol.source.Vector({
                         features: (new ol.format.GeoJSON()).readFeatures(geoJson, {
                             dataProjection: 'EPSG:4326',
@@ -276,12 +270,9 @@
                 var myPoint = 'POINT(' + lon + ' ' + lat + ')';
                 // alert("myPoint: " + myPoint);
 
-
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
                         functionname: 'layTenVung',
                         paPoint: myPoint,
@@ -298,8 +289,6 @@
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
@@ -317,8 +306,6 @@
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
@@ -336,8 +323,6 @@
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
@@ -352,16 +337,17 @@
                     }
                 });
 
+                loaiBenhNhan = document.getElementById("chonBenhNhan").value;
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
                     data: {
                         functionname: 'layViTriBenhNhan',
                         paPoint: myPoint,
-                        paType: malop
+                        paType: malop,
+                        tinhTrang: loaiBenhNhan
                     },
                     success: function(result, status, erro) {
-                        //console.log(result);
                         hienThiViTriBenhNhan(result);
                     },
                     error: function(req, status, error) {
@@ -372,15 +358,13 @@
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    // dataType: 'json',
-                    // highLightObj(result);
                     data: {
-                        functionname: 'getGeoVNMToAjax',
+                        functionname: 'layVung',
                         paPoint: myPoint,
                         paType: malop
                     },
                     success: function(result, status, erro) {
-                        highLightObj(result);
+                        hienThiVung(result);
                     },
                     error: function(req, status, error) {
                         alert("lỗI:" + req + " " + status + " " + error);

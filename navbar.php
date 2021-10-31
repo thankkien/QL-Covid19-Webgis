@@ -7,9 +7,11 @@
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
             <a class="dropdown-item" href="index.php">1. Trang Chủ</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="VNM_View.php?layerview=0">2. Xem</a>
+            <a class="dropdown-item" href="VNM_View.php?layerview=0&style=0">2. Xem</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="VNM_Insert.php?layerview=0">3. Thêm bệnh nhân</a>
+            <a class="dropdown-item" href="VNM_Insert.php?layerview=0&style=0">3. Thêm bệnh nhân</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="VNM_Manage.php">4. Sửa, xóa</a>
         </div>
     </div>
 

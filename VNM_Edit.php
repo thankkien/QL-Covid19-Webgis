@@ -64,6 +64,10 @@
 
             <form>
                 <div class="form-group">
+                    <label for="maBenhNhan">Mã bệnh nhân</label><br>
+                    <input type="number" id="maBenhNhan" name="maBenhNhan" readonly><br>
+                </div>
+                <div class="form-group">
                     <label for="hoten">Họ và tên</label><br>
                     <input type="text" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
                 </div>
@@ -99,7 +103,7 @@
                     <label for="lat">Vĩ độ</label><br>
                     <input type="text" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
                 </div>
-                <button class="btn btn-danger" type="add" id="add" onclick="insertData()">Thêm bệnh nhân</button>
+                <button class="btn btn-danger" type="add" id="add" onclick="insertData()">Sửa thông tin</button>
             </form>
         </div>
         <div class="col-9">
