@@ -50,13 +50,11 @@
             <h3 class="text-center">Chọn đối tượng</h3>
             <div>
                 <select id="chonBenhNhan" class="custom-select">
-                    <option selected value="0">Đã khỏi</option>
-                    <option value="1">Bệnh nhân</option>
+                    <option value="0">Đã khỏi</option>
+                    <option selected value="1">Bệnh nhân</option>
                     <option value="2">Đã tử vong</option>
                 </select>
             </div>
-
-
             <h3 class="text-center">Thống kê</h3>
             <table class="table">
                 <thead>
@@ -198,7 +196,9 @@
             });
             map.addLayer(vectorPoint);
 
-            function hienThiTenVung(checker, myPoint, malop) {
+            var myPoint;
+
+            function hienThiTenVung(checker) {
                 //alert("result: " + result);
                 //alert("coordinate des: " + coordinate);
                 if (checker == 1) {
@@ -226,7 +226,7 @@
                 } else document.getElementById("diaDiem").innerHTML = "...";
             }
 
-            function hienThiSoLuong(checker, myPoint) {
+            function hienThiSoLuong(checker) {
                 if (checker == 1) {
                     $.ajax({
                         type: "POST",
@@ -251,8 +251,7 @@
                 }
             }
 
-            function hienThiVung(checker, myPoint) {
-                //console.log("myPoint: " + myPoint);
+            function hienThiVung(checker) {
                 if (checker == 1) {
                     $.ajax({
                         type: "POST",
@@ -282,7 +281,8 @@
                 } else vectorPolygon.setSource();
             }
 
-            function hienThiViTriBenhNhan(checker, myPoint) {
+            function hienThiViTriBenhNhan(checker) {
+                console.log(myPoint);
                 if (checker == 1) {
                     loaiBenhNhan = document.getElementById("chonBenhNhan").value;
                     $.ajax({
@@ -313,9 +313,7 @@
                 } else vectorPoint.setSource();
             }
 
-            function hienThiThongTin(lon, lat) {
-                var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                var geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
+            function hienThiThongTin() {
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
@@ -325,9 +323,9 @@
                     },
                     success: function(result, status, erro) {
                         if (result != 'null') {
-                            hienThiTenVung(result, myPoint, malop);
+                            hienThiTenVung(result, myPoint);
                             hienThiSoLuong(result, myPoint);
-                            hienThiVung(result, myPoint, malop);
+                            hienThiVung(result, myPoint);
                             hienThiViTriBenhNhan(result, myPoint);
                         }
                     },
@@ -337,20 +335,17 @@
                 });
             }
 
-            var myPoint;
-            document.getElementById("chonBenhNhan").onchange = function() {
-                if (myPoint != "") {
-                    hienThiViTriBenhNhan(myPoint);
-                }
-            }
-
             map.on('singleclick', function(evt) {
                 var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
                 var lon = lonlat[0];
                 var lat = lonlat[1];
                 myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
-                hienThiThongTin(lon, lat)
+                hienThiThongTin();
+                document.getElementById("chonBenhNhan").onchange = function() {
+                    if (myPoint != "") {
+                        hienThiViTriBenhNhan(1);
+                    }
+                }
             });
         };
     </script>

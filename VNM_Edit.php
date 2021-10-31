@@ -234,8 +234,11 @@
                 style: styleFunction
             });
             map.addLayer(vectorLayer);
+
+            var myPoint;
+            var geoJsonPoint;
             // hien thi dia diem
-            function hienThiDiem(checker, geoJsonPoint) {
+            function hienThiDiem(checker) {
                 if (checker == "1") {
                     var geoJson = '{"type": "Feature","geometry": ' + geoJsonPoint + '}';
                     var vectorSource = new ol.source.Vector({
@@ -255,7 +258,7 @@
                 }
             }
             // hien thi thong tin dia diem
-            function hienThiTTDiaDiem(checker, myPoint) {
+            function hienThiTTDiaDiem(checker) {
                 if (checker == 1) {
                     $.ajax({
                         type: "POST",
@@ -284,9 +287,7 @@
                 }
             }
             // hien thi diem, thong tin dia diem bang kinh do va vi do
-            function hienThiThongTin(lon, lat) {
-                var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                var geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
+            function hienThiThongTin() {
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
@@ -339,7 +340,9 @@
                 var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
                 var lon = lonlat[0];
                 var lat = lonlat[1];
-                hienThiThongTin(lon, lat)
+                myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
+                hienThiThongTin();
             });
         };
 
