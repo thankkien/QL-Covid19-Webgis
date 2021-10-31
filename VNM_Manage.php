@@ -52,31 +52,36 @@
                     functionname: 'layDsBenhNhan'
                 },
                 success: function(result, status, erro) {
-                    hienThiDanhSach(result);
+                    if (result != 'null') {
+                        hienThiDanhSach(result);
+                    }
                 },
                 error: function(req, status, error) {
                     alert(req + " " + status + " " + error);
                 }
             });
         })
-        function xoaBenhNhan(id) {
-                $.ajax({
-                    type: "POST",
-                    url: "VNM_pgsqlAPI.php",
 
-                    data: {
-                        functionname: 'xoaBenhNhan',
-                        mabenhnhan: id
-                    },
-                    success: function(result, status, erro) {
+        function xoaBenhNhan(id) {
+            $.ajax({
+                type: "POST",
+                url: "VNM_pgsqlAPI.php",
+
+                data: {
+                    functionname: 'xoaBenhNhan',
+                    mabenhnhan: id
+                },
+                success: function(result, status, erro) {
+                    if (result != 'null') {
                         alert(result);
                         location.reload();
-                    },
-                    error: function(req, status, error) {
-                        alert(req + " " + status + " " + error);
                     }
-                });
-            }
+                },
+                error: function(req, status, error) {
+                    alert(req + " " + status + " " + error);
+                }
+            });
+        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

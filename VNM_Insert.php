@@ -17,20 +17,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
     <style>
-        .map,
-        .righ-panel {
-            height: 500px;
-            width: 80%;
-            float: left;
-        }
-
-        .map,
-        .righ-panel {
-            height: 98vh;
-            width: 80vw;
-            float: left;
-        }
-
         .map {
             border: 1px solid #000;
         }
@@ -39,70 +25,79 @@
 
 <body onload="initialize_map();">
     <?php include 'navbar.php' ?>
-
-    <div class="row">
-        <div class="col">
-            <form action="" method="GET" class="row">
-                <div class="col">
-                    <select name="style" class="custom-select">
+    <div class="row my-2">
+        <div class="col-4 px-4">
+            <h3 class="text-center">Chọn Bản Đồ </h3>
+            <form action="" method="GET" class="my-2">
+                <div class="input-group">
+                    <select name="style" class="custom-select ">
                         <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 0) ? "selected" : " " ?> value="0">polygon</option>
                         <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 1) ? "selected" : " " ?> value="1">line</option>
                     </select>
-                </div>
-                <div class="col">
-                    <select name="layerview" class="custom-select">
+
+                    <select name="layerview" class="custom-select ">
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 0) ? "selected" : " " ?> value="0">Việt Nam</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 1) ? "selected" : " " ?> value="1">Tỉnh/Thành Phố</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 2) ? "selected" : " " ?> value="2">Quận/Huyện</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 3) ? "selected" : " " ?> value="3">Xã/Phường</option>
                     </select>
-                </div>
-                <div class="col">
-                    <button class="btn btn-danger" type="changeaddiew">Chọn</button>
+                    <div class="input-group-append">
+                        <button class="btn btn-danger input-group-append" type="submit">Chọn</button>
+                    </div>
                 </div>
             </form>
-
-            <div>
-                <div class="form-group">
-                    <label for="hoten">Họ và tên</label><br>
-                    <input type="text" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
+            <h3 class="text-center">Thông Tin Người Bệnh </h3>
+            <form class="my-2">
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="hoten">Họ và tên</label><br>
+                        <input type="text" class="form-control" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="ngaysinh">Ngày sinh</label><br>
+                        <input type="date" class="form-control" id="ngaysinh" name="ngaysinh" min="1900-01-01" max="2030-12-31"><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="ngaysinh">Năm sinh</label><br>
-                    <input type="date" id="ngaysinh" name="ngaysinh" min="1900-01-01" max="2030-12-31"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="cccd">Số căn cước công dân</label><br>
+                        <input type="number" class="form-control" id="cccd" name="cccd" placeholder="Nhập số căn cước công dân" min="0" max="999999999999" maxlength="12"><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="cccd">Số căn cước công dân</label><br>
-                    <input type="number" id="cccd" name="cccd" placeholder="Nhập số căn cước công dân" min="0" max="999999999999" maxlength="12"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="diachi">Số nhà/ngõ/đường..</label><br>
+                        <input type="text" class="form-control" id="diachi" placeholder="Nhập số nhà/ngõ/đường" name="diachi"><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="xa">Xã/Phường</label><br>
+                        <input type="text" class="form-control" id="xa" name="xa" placeholder="Xã..." readonly><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="diachi">Địa chỉ chi tiết</label><br>
-                    <input type="text" id="diachi" placeholder="Nhập số nhà/ngõ/đường" name="diachi"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="huyen">Huyện/Quận</label><br>
+                        <input type="text" class="form-control" id="huyen" name="huyen" placeholder="Huyện..." readonly><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="tinh">Tỉnh/Thành Phố</label><br>
+                        <input type="text" class="form-control" id="tinh" name="tinh" placeholder="Tỉnh..." readonly><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="xa">Xã/Phường</label><br>
-                    <input type="text" id="xa" name="xa" placeholder="Xã..." readonly><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="lon">Kinh độ</label><br>
+                        <input type="text" class="form-control" id="lon" name="lon" placeholder="Kinh độ điểm được chọn" readonly><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="lat">Vĩ độ</label><br>
+                        <input type="text" class="form-control" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="huyen">Huyện/Quận</label><br>
-                    <input type="text" id="huyen" name="huyen" placeholder="Huyện..." readonly><br>
-                </div>
-                <div class="form-group">
-                    <label for="tinh">Tỉnh/Thành Phố</label><br>
-                    <input type="text" id="tinh" name="tinh" placeholder="Tỉnh..." readonly><br>
-                </div>
-                <div class="form-group">
-                    <label for="lon">Kinh độ</label><br>
-                    <input type="text" id="lon" name="lon" placeholder="Kinh độ điểm được chọn" readonly><br>
-                </div>
-                <div class="form-group">
-                    <label for="lat">Vĩ độ</label><br>
-                    <input type="text" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
-                </div>
-                <button class="btn btn-danger" type="add" id="add" onclick="insertData()">Thêm bệnh nhân</button>
-            </div>
+            </form>
+            <button class="btn btn-danger" style="float:right" type="add" id="add" onclick="insertData()">Thêm bệnh nhân</button>
         </div>
-        <div class="col-9">
+        <div class="col-8">
             <div id="map" class="map"></div>
         </div>
     </div>
@@ -235,10 +230,9 @@
             });
             map.addLayer(vectorLayer);
 
-            function hienThiDiem(result, lon, lat) {
-                //console.log(result);
-                if (result == "1") {
-                    var geoJson = '{"type": "Feature","geometry": {"type": "Point","properties": {"name": "Dinagat Islands"},"coordinates": [' + lon + ', ' + lat + ']}}'
+            function hienThiDiem(checker, geoJsonPoint) {
+                if (checker == "1") {
+                    var geoJson = '{"type": "Feature","geometry": ' + geoJsonPoint + '}';
                     var vectorSource = new ol.source.Vector({
                         features: (new ol.format.GeoJSON()).readFeatures(geoJson, {
                             dataProjection: 'EPSG:4326',
@@ -246,8 +240,9 @@
                         })
                     });
                     vectorLayer.setSource(vectorSource);
-                    document.getElementById("lon").value = lon;
-                    document.getElementById("lat").value = lat;
+                    objJson = JSON.parse(geoJsonPoint);
+                    document.getElementById("lon").value = objJson.coordinates[0];
+                    document.getElementById("lat").value = objJson.coordinates[1];
                 } else {
                     vectorLayer.setSource(vectorSource);
                     document.getElementById("lon").value = '';
@@ -255,68 +250,65 @@
                 }
             }
 
-            function hienThiThongTin(result, coordinate) {
-                //alert("result: " + result);
-                //alert("coordinate des: " + coordinate);
-                if (result != null) {
-                    const obj = JSON.parse(result);
-                    document.getElementById("xa").value = obj.xa;
-                    document.getElementById("huyen").value = obj.huyen;
-                    document.getElementById("tinh").value = obj.tinh;
+            function hienThiTTDiaDiem(checker, myPoint) {
+                if (checker == 1) {
+                    $.ajax({
+                        type: "POST",
+                        url: "VNM_pgsqlAPI.php",
+                        data: {
+                            functionname: 'layTenVung',
+                            paPoint: myPoint,
+                            paType: 3
+                        },
+                        success: function(result, status, erro) {
+                            if (result != "null") {
+                                const obj = JSON.parse(result);
+                                document.getElementById("xa").value = obj.xa;
+                                document.getElementById("huyen").value = obj.huyen;
+                                document.getElementById("tinh").value = obj.tinh;
+                            }
+                        },
+                        error: function(req, status, error) {
+                            alert(req + " " + status + " " + error);
+                        }
+                    });
                 } else {
                     document.getElementById("xa").value = "";
                     document.getElementById("huyen").value = "";
                     document.getElementById("tinh").value = "";
                 }
-                //$("#info").html(result);
             }
 
-            map.on('singleclick', function(evt) {
-                //alert("coordinate org: " + evt.coordinate);
-                //var myPoint = 'POINT(12,5)';
-
-                var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-                var lon = lonlat[0];
-                var lat = lonlat[1];
+            function hienThiThongTin(lon, lat) {
                 var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-
+                var geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
                         functionname: 'kiemTraTrongVietNam',
                         paPoint: myPoint
                     },
                     success: function(result, status, erro) {
-                        hienThiDiem(result, lon, lat);
+                        if (result != "null") {
+                            hienThiTTDiaDiem(result, myPoint);
+                            hienThiDiem(result, geoJsonPoint);
+                        }
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
                     }
                 });
+            }
 
-                $.ajax({
-                    type: "POST",
-                    url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
-                    data: {
-                        functionname: 'layTenVung',
-                        paPoint: myPoint,
-                        paType: 3
-                    },
-                    success: function(result, status, erro) {
-                        hienThiThongTin(result, evt.coordinate);
-                    },
-                    error: function(req, status, error) {
-                        alert(req + " " + status + " " + error);
-                    }
-                });
-                //alert("myPoint: " + myPoint);
-                //*
-                //*/
+            map.on('singleclick', function(evt) {
+                //alert("coordinate org: " + evt.coordinate);
+                //var myPoint = 'POINT(12,5)';
+                var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                var lon = lonlat[0];
+                var lat = lonlat[1];
+                var myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                hienThiThongTin(lon, lat)
             });
         };
         //});

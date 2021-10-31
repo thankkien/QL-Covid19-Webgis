@@ -17,20 +17,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
     <style>
-        .map,
-        .righ-panel {
-            height: 500px;
-            width: 80%;
-            float: left;
-        }
-
-        .map,
-        .righ-panel {
-            height: 98vh;
-            width: 80vw;
-            float: left;
-        }
-
         .map {
             border: 1px solid #000;
         }
@@ -40,81 +26,97 @@
 <body onload="initialize_map();">
     <?php include 'navbar.php' ?>
 
-    <div class="row">
-        <div class="col">
-            <form action="" method="GET" class="row">
-                <div class="col">
-                    <select name="style" class="custom-select">
+    <div class="row my-2">
+        <div class="col-4 px-4">
+            <h3 class="text-center">Chọn Bản Đồ </h3>
+            <form action="" method="GET" class="my-2">
+                <div class="input-group">
+                    <select name="style" class="custom-select ">
                         <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 0) ? "selected" : " " ?> value="0">polygon</option>
                         <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 1) ? "selected" : " " ?> value="1">line</option>
                     </select>
-                </div>
-                <div class="col">
-                    <select name="layerview" class="custom-select">
+
+                    <select name="layerview" class="custom-select ">
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 0) ? "selected" : " " ?> value="0">Việt Nam</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 1) ? "selected" : " " ?> value="1">Tỉnh/Thành Phố</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 2) ? "selected" : " " ?> value="2">Quận/Huyện</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 3) ? "selected" : " " ?> value="3">Xã/Phường</option>
                     </select>
-                </div>
-                <div class="col">
-                    <button class="btn btn-danger" type="changeaddiew">Chọn</button>
+                    <div class="input-group-append">
+                        <button class="btn btn-danger input-group-append" type="submit">Chọn</button>
+                    </div>
                 </div>
             </form>
-            <div>
-
-                <div class="form-group">
-                    <label for="mabenhnhan">Mã bệnh nhân</label><br>
-                    <input type="number" id="mabenhnhan" name="mabenhnhan" value="<?php if (isset($_GET["mabenhnhan"])) echo $_GET["mabenhnhan"] ?>" readonly><br>
+            <h3 class="text-center">Thông Tin Người Bệnh </h3>
+            <form class="my-2">
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="mabenhnhan">Mã bệnh nhân</label><br>
+                        <input type="number" class="form-control" id="mabenhnhan" name="mabenhnhan" value="<?php if (isset($_GET["mabenhnhan"])) echo $_GET["mabenhnhan"] ?>" readonly><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="tinhtrang">Tình trạng</label><br>
+                        <select id="tinhtrang" class="custom-select col">
+                            <option value="0">Đã khỏi</option>
+                            <option value="1">Bị bệnh</option>
+                            <option value="2">Đã tử vong</option>
+                        </select>
+                    </div>
                 </div>
-                <select id="tinhtrang" class="custom-select">
-                    <option value="0">Đã khỏi</option>
-                    <option selected value="1">Bị bệnh</option>
-                    <option value="2">Đã tử vong</option>
-                </select>
-                <div class="form-group">
-                    <label for="hoten">Họ và tên</label><br>
-                    <input type="text" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="hoten">Họ và tên</label><br>
+                        <input type="text" class="form-control" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="ngaysinh">Ngày sinh</label><br>
+                        <input type="date" class="form-control" id="ngaysinh" name="ngaysinh" min="1900-01-01" max="2030-12-31"><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="ngaysinh">Năm sinh</label><br>
-                    <input type="date" id="ngaysinh" name="ngaysinh" min="1900-01-01" max="2030-12-31"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="cccd">Số căn cước công dân</label><br>
+                        <input type="number" class="form-control" id="cccd" name="cccd" placeholder="Nhập số căn cước công dân" min="0" max="999999999999" maxlength="12"><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="cccd">Số căn cước công dân</label><br>
-                    <input type="number" id="cccd" name="cccd" placeholder="Nhập số căn cước công dân" min="0" max="999999999999"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="diachi">Số nhà/ngõ/đường..</label><br>
+                        <input type="text" class="form-control" id="diachi" placeholder="Nhập số nhà/ngõ/đường" name="diachi"><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="xa">Xã/Phường</label><br>
+                        <input type="text" class="form-control" id="xa" name="xa" placeholder="Xã..." readonly><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="diachi">Địa chỉ chi tiết</label><br>
-                    <input type="text" id="diachi" placeholder="Nhập số nhà/ngõ/đường" name="diachi"><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="huyen">Huyện/Quận</label><br>
+                        <input type="text" class="form-control" id="huyen" name="huyen" placeholder="Huyện..." readonly><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="tinh">Tỉnh/Thành Phố</label><br>
+                        <input type="text" class="form-control" id="tinh" name="tinh" placeholder="Tỉnh..." readonly><br>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="xa">Xã/Phường</label><br>
-                    <input type="text" id="xa" name="xa" placeholder="Xã..." readonly><br>
+                <div class="row">
+                    <div class="form-group col">
+                        <label for="lon">Kinh độ</label><br>
+                        <input type="text" class="form-control" id="lon" name="lon" placeholder="Kinh độ điểm được chọn" readonly><br>
+                    </div>
+                    <div class="form-group col">
+                        <label for="lat">Vĩ độ</label><br>
+                        <input type="text" class="form-control" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="huyen">Huyện/Quận</label><br>
-                    <input type="text" id="huyen" name="huyen" placeholder="Huyện..." readonly><br>
-                </div>
-                <div class="form-group">
-                    <label for="tinh">Tỉnh/Thành Phố</label><br>
-                    <input type="text" id="tinh" name="tinh" placeholder="Tỉnh..." readonly><br>
-                </div>
-                <div class="form-group">
-                    <label for="lon">Kinh độ</label><br>
-                    <input type="text" id="lon" name="lon" placeholder="Kinh độ điểm được chọn" readonly><br>
-                </div>
-                <div class="form-group">
-                    <label for="lat">Vĩ độ</label><br>
-                    <input type="text" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
-                </div>
-                <button class="btn btn-danger" type="add" id="add" onclick="editData()">Sửa thông tin</button>
-            </div>
+            </form>
+            <button class="btn btn-danger" style="float:right" type="edit" id="edit" onclick="editData()">Sửa Thông Tin</button>
         </div>
-        <div class="col-9">
+        <div class="col-8">
             <div id="map" class="map"></div>
         </div>
     </div>
+
     <script>
         var format = 'image/png';
         var map;
@@ -264,10 +266,12 @@
                             paType: 3
                         },
                         success: function(result, status, erro) {
-                            const obj = JSON.parse(result);
-                            document.getElementById("xa").value = obj.xa;
-                            document.getElementById("huyen").value = obj.huyen;
-                            document.getElementById("tinh").value = obj.tinh;
+                            if (result != "null") {
+                                const obj = JSON.parse(result);
+                                document.getElementById("xa").value = obj.xa;
+                                document.getElementById("huyen").value = obj.huyen;
+                                document.getElementById("tinh").value = obj.tinh;
+                            }
                         },
                         error: function(req, status, error) {
                             alert(req + " " + status + " " + error);
@@ -291,8 +295,10 @@
                         paPoint: myPoint
                     },
                     success: function(result, status, erro) {
-                        hienThiTTDiaDiem(result, myPoint);
-                        hienThiDiem(result, geoJsonPoint);
+                        if (result != "null") {
+                            hienThiTTDiaDiem(result, myPoint);
+                            hienThiDiem(result, geoJsonPoint);
+                        }
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
@@ -309,16 +315,17 @@
                         mabenhnhan: document.getElementById("mabenhnhan").value
                     },
                     success: function(result, status, erro) {
-                        //alert(result);
-                        objJson = JSON.parse(result);
-                        document.getElementById("hoten").value = objJson.hoten;
-                        document.getElementById("tinhtrang").value = objJson.tinhtrang;
-                        document.getElementById("ngaysinh").value = objJson.ngaysinh;
-                        document.getElementById("diachi").value = objJson.diachi;
-                        document.getElementById("cccd").value = objJson.cccd;
-                        document.getElementById("lon").value = objJson.vitribenhnhan.coordinates[0];
-                        document.getElementById("lat").value = objJson.vitribenhnhan.coordinates[1];
-                        hienThiThongTin(objJson.vitribenhnhan.coordinates[0], objJson.vitribenhnhan.coordinates[1]);
+                        if (result != "null") {
+                            objJson = JSON.parse(result);
+                            document.getElementById("hoten").value = objJson.hoten;
+                            document.getElementById("tinhtrang").value = objJson.tinhtrang;
+                            document.getElementById("ngaysinh").value = objJson.ngaysinh;
+                            document.getElementById("diachi").value = objJson.diachi;
+                            document.getElementById("cccd").value = objJson.cccd;
+                            document.getElementById("lon").value = objJson.vitribenhnhan.coordinates[0];
+                            document.getElementById("lat").value = objJson.vitribenhnhan.coordinates[1];
+                            hienThiThongTin(objJson.vitribenhnhan.coordinates[0], objJson.vitribenhnhan.coordinates[1]);
+                        }
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
