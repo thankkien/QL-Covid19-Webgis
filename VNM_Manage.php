@@ -35,7 +35,6 @@
             </thead>
             <tbody id="hienthi">
 
-
             </tbody>
         </table>
     </div>
@@ -60,8 +59,6 @@
                 }
             });
         })
-        
-
         function xoaBenhNhan(id) {
                 $.ajax({
                     type: "POST",
@@ -69,7 +66,7 @@
 
                     data: {
                         functionname: 'xoaBenhNhan',
-                        maBenhNhan: id
+                        mabenhnhan: id
                     },
                     success: function(result, status, erro) {
                         alert(result);

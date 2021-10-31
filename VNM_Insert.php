@@ -62,7 +62,7 @@
                 </div>
             </form>
 
-            <form>
+            <div>
                 <div class="form-group">
                     <label for="hoten">Họ và tên</label><br>
                     <input type="text" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
@@ -100,14 +100,12 @@
                     <input type="text" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
                 </div>
                 <button class="btn btn-danger" type="add" id="add" onclick="insertData()">Thêm bệnh nhân</button>
-            </form>
+            </div>
         </div>
         <div class="col-9">
             <div id="map" class="map"></div>
         </div>
     </div>
-
-    <?php include 'VNM_pgsqlAPI.php' ?>
     <script>
         //$("#document").ready(function () {
         var format = 'image/png';
@@ -159,7 +157,8 @@
                         paPoint: myPoint
                     },
                     success: function(result, status, erro) {
-                        alert("Đã thêm thành công bênh nhân số: " + result);
+                        console.log(result);
+                        alert(result);
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);

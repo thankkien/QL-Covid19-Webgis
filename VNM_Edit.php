@@ -61,12 +61,17 @@
                     <button class="btn btn-danger" type="changeaddiew">Chọn</button>
                 </div>
             </form>
+            <div>
 
-            <form>
                 <div class="form-group">
-                    <label for="maBenhNhan">Mã bệnh nhân</label><br>
-                    <input type="number" id="maBenhNhan" name="maBenhNhan" readonly><br>
+                    <label for="mabenhnhan">Mã bệnh nhân</label><br>
+                    <input type="number" id="mabenhnhan" name="mabenhnhan" value="<?php if (isset($_GET["mabenhnhan"])) echo $_GET["mabenhnhan"] ?>" readonly><br>
                 </div>
+                <select id="tinhtrang" class="custom-select">
+                    <option value="0">Đã khỏi</option>
+                    <option selected value="1">Bị bệnh</option>
+                    <option value="2">Đã tử vong</option>
+                </select>
                 <div class="form-group">
                     <label for="hoten">Họ và tên</label><br>
                     <input type="text" id="hoten" placeholder="Nhập họ và tên" name="hoten"><br>
@@ -77,7 +82,7 @@
                 </div>
                 <div class="form-group">
                     <label for="cccd">Số căn cước công dân</label><br>
-                    <input type="number" id="cccd" name="cccd" placeholder="Nhập số căn cước công dân" min="0" max="999999999999" maxlength="12"><br>
+                    <input type="number" id="cccd" name="cccd" placeholder="Nhập số căn cước công dân" min="0" max="999999999999"><br>
                 </div>
                 <div class="form-group">
                     <label for="diachi">Địa chỉ chi tiết</label><br>
@@ -103,17 +108,14 @@
                     <label for="lat">Vĩ độ</label><br>
                     <input type="text" id="lat" name="lat" placeholder="Vĩ độ điểm được chọn" readonly>
                 </div>
-                <button class="btn btn-danger" type="add" id="add" onclick="insertData()">Sửa thông tin</button>
-            </form>
+                <button class="btn btn-danger" type="add" id="add" onclick="editData()">Sửa thông tin</button>
+            </div>
         </div>
         <div class="col-9">
             <div id="map" class="map"></div>
         </div>
     </div>
-
-    <?php include 'VNM_pgsqlAPI.php' ?>
     <script>
-        //$("#document").ready(function () {
         var format = 'image/png';
         var map;
         var minX = 102.14458465576172;
@@ -140,30 +142,35 @@
             else return "gadm36_vnm_0"
         };
 
-        function insertData() {
+        function editData() {
+            var gtmabenhnhan = document.getElementById("mabenhnhan").value;
             var gthoten = document.getElementById("hoten").value;
+            var gttinhtrang = document.getElementById("tinhtrang").value;
             var gtngaysinh = document.getElementById("ngaysinh").value;
             var gtdiachi = document.getElementById("diachi").value;
             var gtcccd = document.getElementById("cccd").value;
             var gtlon = document.getElementById("lon").value;
             var gtlat = document.getElementById("lat").value;
-            if (gthoten != "" && gtngaysinh != "" && gtdiachi != "" && gtcccd != "" && gtlon != "" && gtlat != "") {
+            if (gtmabenhnhan != "" && gthoten != "" && gtngaysinh != "" && gtdiachi != "" && gtcccd != "" && gtlon != "" && gtlat != "") {
+                //alert(gtmabenhnhan + ", " +gthoten + ", " + gttinhtrang + ", " + gtngaysinh + ", " + gtdiachi + ", " + gtcccd + ", " + gtlon + ", " + gtlat);
                 var myPoint = 'POINT(' + gtlon + ' ' + gtlat + ')';
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
-                        functionname: 'themVaoCSDL',
+                        functionname: 'suaBenhNhan',
                         hoten: gthoten,
                         ngaysinh: gtngaysinh,
                         diachi: gtdiachi,
                         cccd: gtcccd,
+                        tinhtrang: gttinhtrang,
+                        mabenhnhan: gtmabenhnhan,
                         paPoint: myPoint
                     },
                     success: function(result, status, erro) {
-                        alert("Đã thêm thành công bênh nhân số: " + result);
+                        //console.log(result)
+                        alert(result);
+                        window.location.replace("VNM_Manage.php");
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
@@ -218,20 +225,6 @@
                             width: 1
                         })
                     }),
-                    // text: new ol.style.Text({
-                    //     font: '12px Calibri,sans-serif',
-
-                    //     fill: new ol.style.Fill({
-                    //         color: '#000'
-                    //     }),
-                    //     stroke: new ol.style.Stroke({
-                    //         color: '#fff',
-                    //         width: 2
-                    //     }),
-                    //     // get the text from the feature - this is ol.Feature
-                    //     // and show only under certain resolution
-                    //     text: feature.get('name') //'example'//this.get('description')
-                    // })
                 })]
             };
             var vectorLayer = new ol.layer.Vector({
@@ -239,11 +232,10 @@
                 style: styleFunction
             });
             map.addLayer(vectorLayer);
-
-            function hienThiDiem(result, lon, lat) {
-                //console.log(result);
-                if (result == "1") {
-                    var geoJson = '{"type": "Feature","geometry": {"type": "Point","properties": {"name": "Dinagat Islands"},"coordinates": [' + lon + ', ' + lat + ']}}'
+            // hien thi dia diem
+            function hienThiDiem(checker, geoJsonPoint) {
+                if (checker == "1") {
+                    var geoJson = '{"type": "Feature","geometry": ' + geoJsonPoint + '}';
                     var vectorSource = new ol.source.Vector({
                         features: (new ol.format.GeoJSON()).readFeatures(geoJson, {
                             dataProjection: 'EPSG:4326',
@@ -251,79 +243,99 @@
                         })
                     });
                     vectorLayer.setSource(vectorSource);
-                    document.getElementById("lon").value = lon;
-                    document.getElementById("lat").value = lat;
+                    objJson = JSON.parse(geoJsonPoint);
+                    document.getElementById("lon").value = objJson.coordinates[0];
+                    document.getElementById("lat").value = objJson.coordinates[1];
                 } else {
                     vectorLayer.setSource(vectorSource);
                     document.getElementById("lon").value = '';
                     document.getElementById("lat").value = '';
                 }
             }
-
-            function hienThiThongTin(result, coordinate) {
-                //alert("result: " + result);
-                //alert("coordinate des: " + coordinate);
-                if (result != null) {
-                    const obj = JSON.parse(result);
-                    document.getElementById("xa").value = obj.xa;
-                    document.getElementById("huyen").value = obj.huyen;
-                    document.getElementById("tinh").value = obj.tinh;
+            // hien thi thong tin dia diem
+            function hienThiTTDiaDiem(checker, myPoint) {
+                if (checker == 1) {
+                    $.ajax({
+                        type: "POST",
+                        url: "VNM_pgsqlAPI.php",
+                        data: {
+                            functionname: 'layTenVung',
+                            paPoint: myPoint,
+                            paType: 3
+                        },
+                        success: function(result, status, erro) {
+                            const obj = JSON.parse(result);
+                            document.getElementById("xa").value = obj.xa;
+                            document.getElementById("huyen").value = obj.huyen;
+                            document.getElementById("tinh").value = obj.tinh;
+                        },
+                        error: function(req, status, error) {
+                            alert(req + " " + status + " " + error);
+                        }
+                    });
                 } else {
                     document.getElementById("xa").value = "";
                     document.getElementById("huyen").value = "";
                     document.getElementById("tinh").value = "";
                 }
-                //$("#info").html(result);
             }
-
-            map.on('singleclick', function(evt) {
-                //alert("coordinate org: " + evt.coordinate);
-                //var myPoint = 'POINT(12,5)';
-
-                var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-                var lon = lonlat[0];
-                var lat = lonlat[1];
+            // hien thi diem, thong tin dia diem bang kinh do va vi do
+            function hienThiThongTin(lon, lat) {
                 var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-
+                var geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
                         functionname: 'kiemTraTrongVietNam',
                         paPoint: myPoint
                     },
                     success: function(result, status, erro) {
-                        hienThiDiem(result, lon, lat);
+                        hienThiTTDiaDiem(result, myPoint);
+                        hienThiDiem(result, geoJsonPoint);
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
                     }
                 });
-
+            }
+            // load cac truong gia tri ban dau cua benh nhan
+            $("#document").ready(function() {
                 $.ajax({
                     type: "POST",
                     url: "VNM_pgsqlAPI.php",
-                    //dataType: 'json',
-                    //data: {functionname: 'reponseGeoToAjax', paPoint: myPoint},
                     data: {
-                        functionname: 'layTenVung',
-                        paPoint: myPoint,
-                        paType: 3
+                        functionname: 'layTTBenhNhan',
+                        mabenhnhan: document.getElementById("mabenhnhan").value
                     },
                     success: function(result, status, erro) {
-                        hienThiThongTin(result, evt.coordinate);
+                        //alert(result);
+                        objJson = JSON.parse(result);
+                        document.getElementById("hoten").value = objJson.hoten;
+                        document.getElementById("tinhtrang").value = objJson.tinhtrang;
+                        document.getElementById("ngaysinh").value = objJson.ngaysinh;
+                        document.getElementById("diachi").value = objJson.diachi;
+                        document.getElementById("cccd").value = objJson.cccd;
+                        document.getElementById("lon").value = objJson.vitribenhnhan.coordinates[0];
+                        document.getElementById("lat").value = objJson.vitribenhnhan.coordinates[1];
+                        hienThiThongTin(objJson.vitribenhnhan.coordinates[0], objJson.vitribenhnhan.coordinates[1]);
                     },
                     error: function(req, status, error) {
                         alert(req + " " + status + " " + error);
                     }
                 });
-                //alert("myPoint: " + myPoint);
-                //*
-                //*/
+            })
+            // click tren ban do hien thi diem, thong tin dia diem
+            map.on('singleclick', function(evt) {
+                //alert("coordinate org: " + evt.coordinate);
+                //var myPoint = 'POINT(12,5)';
+                var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                var lon = lonlat[0];
+                var lat = lonlat[1];
+                hienThiThongTin(lon, lat)
             });
         };
+
         //});
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

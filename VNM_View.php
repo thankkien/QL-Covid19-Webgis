@@ -91,8 +91,6 @@
             <div id="map" class="map"></div>
         </div>
     </div>
-
-    <?php include 'VNM_pgsqlAPI.php' ?>
     <script>
         var format = 'image/png';
         var map;
@@ -293,7 +291,7 @@
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
                         paType: malop,
-                        tinhTrang: 0
+                        tinhtrang: 0
                     },
                     success: function(result, status, erro) {
                         hienThiSoDaKhoi(result, evt.coordinate);
@@ -310,7 +308,7 @@
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
                         paType: malop,
-                        tinhTrang: 1
+                        tinhtrang: 1
                     },
                     success: function(result, status, erro) {
                         hienThiSoBenhNhan(result, evt.coordinate);
@@ -327,7 +325,7 @@
                         functionname: 'laySoLuongBenhNhan',
                         paPoint: myPoint,
                         paType: malop,
-                        tinhTrang: 2
+                        tinhtrang: 2
                     },
                     success: function(result, status, erro) {
                         hienThiSoTuVong(result, evt.coordinate);
@@ -345,7 +343,7 @@
                         functionname: 'layViTriBenhNhan',
                         paPoint: myPoint,
                         paType: malop,
-                        tinhTrang: loaiBenhNhan
+                        tinhtrang: loaiBenhNhan
                     },
                     success: function(result, status, erro) {
                         hienThiViTriBenhNhan(result);

@@ -5,12 +5,12 @@ if (isset($_POST['functionname'])) {
     $paSRID = '4326';
     $paPoint = isset($_POST['paPoint']) ? $_POST['paPoint'] : '';
     $paType = isset($_POST['paType']) ? $_POST['paType'] : '';
-    $maBenhNhan = isset($_POST['maBenhNhan']) ? $_POST['maBenhNhan'] : '';
+    $mabenhnhan = isset($_POST['mabenhnhan']) ? $_POST['mabenhnhan'] : '';
     $hoten = isset($_POST['hoten']) ? $_POST['hoten'] : '';
     $ngaysinh = isset($_POST['ngaysinh']) ? $_POST['ngaysinh'] : '';
     $diachi = isset($_POST['diachi']) ? $_POST['diachi'] : '';
     $cccd = isset($_POST['cccd']) ? $_POST['cccd'] : '';
-    $tinhTrang = isset($_POST['tinhTrang']) ? $_POST['tinhTrang'] : '';
+    $tinhtrang = isset($_POST['tinhtrang']) ? $_POST['tinhtrang'] : '';
     $aResult = "null";
     if ($functionname == 'layVung') {
         $aResult = layVung($paPDO, $paSRID, $paPoint, $paType);
@@ -19,32 +19,23 @@ if (isset($_POST['functionname'])) {
     } else if ($functionname == 'layTenVung') {
         $aResult = layTenVung($paPDO, $paSRID, $paPoint, $paType);
     } else if ($functionname == 'laySoLuongBenhNhan') {
-        $aResult = laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang);
+        $aResult = laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhtrang);
     } else if ($functionname == 'layViTriBenhNhan') {
-        $aResult = layViTriBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang);
+        $aResult = layViTriBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhtrang);
     } else if ($functionname == 'layDsBenhNhan') {
         $aResult = layDsBenhNhan($paPDO);
+    } else if ($functionname == 'layTTBenhNhan') {
+        $aResult = layTTBenhNhan($paPDO, $mabenhnhan);
     } else if ($functionname == 'themVaoCSDL') {
         $aResult = themVaoCSDL($paPDO, $paSRID, $hoten, $ngaysinh, $diachi, $cccd, $paPoint);
     } else if ($functionname == 'suaBenhNhan') {
-        $aResult = suaBenhNhan($paPDO, $paSRID, $paPoint, $hoten, $ngaysinh, $diachi, $cccd, $tinhTrang, $maBenhNhan);
+        $aResult = suaBenhNhan($paPDO, $paSRID, $paPoint, $hoten, $ngaysinh, $diachi, $cccd, $tinhtrang, $mabenhnhan);
     } else if ($functionname == 'xoaBenhNhan') {
-        $aResult = xoaBenhNhan($paPDO, $maBenhNhan);
+        $aResult = xoaBenhNhan($paPDO, $mabenhnhan);
     }
     echo $aResult;
     closeDB($paPDO);
-} 
-// else if (isset($_GET['functionname'])) {
-//     $paPDO = initDB();
-//     $functionname = $_GET['functionname'];
-//     $maBenhNhan = isset($_GET['maBenhNhan']) ? $_GET['maBenhNhan'] : '';
-//     if ($functionname == 'suaBenhNhan') {
-//         suaBenhNhan($paPDO, $paSRID, $paPoint, $hoten, $ngaysinh, $diachi, $cccd, $tinhTrang, $maBenhNhan);
-//     } else if ($functionname == 'xoaBenhNhan') {
-//         xoaBenhNhan($paPDO, $maBenhNhan);
-//     }
-//     header("Location: VNM_Manage.php");
-// }
+}
 
 function initDB()
 {
@@ -112,29 +103,29 @@ function layVung($paPDO, $paSRID, $paPoint, $paType)
         return null;
 }
 
-function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang)
+function laySoLuongBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhtrang)
 {
     //echo $paPoint;
     $paPoint = str_replace(',', ' ', $paPoint);
     if ($paType == 0)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
             "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_0\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
-            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "WHERE benhnhan.tinhtrang = " . $tinhtrang . " AND " .
             "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 1)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
             "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_1\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
-            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "WHERE benhnhan.tinhtrang = " . $tinhtrang . " AND " .
             "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 2)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
             "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_2\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
-            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "WHERE benhnhan.tinhtrang = " . $tinhtrang . " AND " .
             "ST_Intersects(benhnhan.geom::geometry,vung.geom);";
     else if ($paType == 3)
         $mySQLStr = "SELECT Count(benhnhan.id) as soluong " .
             "FROM \"benhnhan\", (SELECT geom FROM \"gadm36_vnm_3\" WHERE ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry, geom)) as vung " .
-            "WHERE benhnhan.tinhtrang = " . $tinhTrang . " AND " .
+            "WHERE benhnhan.tinhtrang = " . $tinhtrang . " AND " .
             "ST_Intersects( benhnhan.geom::geometry,vung.geom);";
     // echo $mySQLStr;
     $result = query($paPDO, $mySQLStr);
@@ -181,23 +172,23 @@ function layTenVung($paPDO, $paSRID, $paPoint, $paType)
         return null;
 }
 
-function layViTriBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhTrang)
+function layViTriBenhNhan($paPDO, $paSRID, $paPoint, $paType, $tinhtrang)
 {
     //echo $paPoint;
     $paPoint = str_replace(',', ' ', $paPoint);
     //echo $paPoint;
     if ($paType == 0)
         $mySQLStr = "SELECT benhnhan.id as id,  ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_0.geom  from \"gadm36_vnm_0\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
-        where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhTrang;
+        where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhtrang;
     else if ($paType == 1)
         $mySQLStr = "SELECT benhnhan.id as id, ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_1.geom  from \"gadm36_vnm_1\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
-    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhTrang;
+    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhtrang;
     else if ($paType == 2)
         $mySQLStr = "SELECT benhnhan.id as id,  ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_2.geom  from \"gadm36_vnm_2\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
-    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhTrang;
+    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhtrang;
     else if ($paType == 3)
         $mySQLStr = "SELECT benhnhan.id as id,  ST_AsGeoJson(benhnhan.geom) as vitribenhnhan from benhnhan,  (SELECT gadm36_vnm_3.geom  from \"gadm36_vnm_3\" where ST_Within('SRID=" . $paSRID . ";" . $paPoint . "'::geometry,geom)) as vung
-    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhTrang;
+    where ST_Intersects( benhnhan.geom::geometry,vung.geom) and benhnhan.tinhtrang = " . $tinhtrang;
     //echo $mySQLStr;
     $result = query($paPDO, $mySQLStr);
     $row =  count($result);
@@ -249,19 +240,35 @@ function layDsBenhNhan($paPDO)
             else if ($item["tinhtrang"] == 0) $res = $res . "Khỏi Bệnh";
             else if ($item["tinhtrang"] == 2) $res = $res . "Tử Vong";
             $res = $res . '</td>
-             <td><a  href="capnhat.php?id=' . $item['id'] . '"><i class="fas fa-edit"></i> Cập Nhật</a></td>
+             <td><a  href="VNM_Edit.php?mabenhnhan=' . $item['id'] . '"><i class="fas fa-edit"></i> Cập Nhật</a></td>
              <td><a style="color:red"  href="javascript:xoaBenhNhan(' . $item['id'] . ')"><i class="fas fa-trash"></i> Xoá</a></td>
              </tr>';
-             //<td><a style="color:red"  href="VNM_pgsqlAPI.php?functionname=xoaBenhNhan&maBenhNhan=' . $item['id'] . '"><i class="fas fa-trash"></i> Xoá</a></td>
         }
         return $res;
     }
     return "null";
 }
 
+function layTTBenhNhan($paPDO, $mabenhnhan)
+{
+    $mySQLStr =  "SELECT id, hoten, ngaysinh, diachi, cccd, tinhtrang, ST_AsGeoJSON(geom) AS vitribenhnhan FROM benhnhan WHERE id = " . $mabenhnhan;
+    $result = query($paPDO, $mySQLStr);
+    // var_dump($result);
+    if ($result != null) {
+        $item = $result[0];
+        return '{"id":"' . $item["id"] .
+            '", "hoten":"' . $item["hoten"] .
+            '", "ngaysinh":"' . $item["ngaysinh"] .
+            '", "diachi":"' . $item["diachi"] .
+            '", "cccd":"' . $item["cccd"] .
+            '", "tinhtrang":"' . $item["tinhtrang"] .
+            '", "vitribenhnhan":' . $item["vitribenhnhan"] . '}';
+    }
+    return null;
+}
+
 function themVaoCSDL($paPDO, $paSRID, $hoten, $ngaysinh, $diachi, $cccd, $paPoint)
 {
-    //echo $paPoint;
     $mySQLStr = "INSERT INTO public.benhnhan(hoten, ngaysinh, diachi, cccd, tinhtrang, geom) " .
         "VALUES ('" . $hoten . "', '" . $ngaysinh . "', '" . $diachi . "', '" . $cccd . "', 1, 'SRID=" . $paSRID . ";" . $paPoint . "'::geometry);";
     //echo $mySQLStr;
@@ -270,41 +277,43 @@ function themVaoCSDL($paPDO, $paSRID, $hoten, $ngaysinh, $diachi, $cccd, $paPoin
         $result = $paPDO->prepare($mySQLStr);
         $result->execute();
         $inserted_id = $paPDO->lastInsertId();
-        return $inserted_id;
+        return "Đã thêm thành công bênh nhân số: " . $inserted_id;
     } catch (PDOException $e) {
         echo "Thất bại, Lỗi: " . $e->getMessage();
         return null;
     }
 }
 
-function suaBenhNhan($paPDO, $paSRID, $paPoint, $hoten, $ngaysinh, $diachi, $cccd, $tinhTrang, $maBenhNhan)
+function suaBenhNhan($paPDO, $paSRID, $paPoint, $hoten, $ngaysinh, $diachi, $cccd, $tinhtrang, $mabenhnhan)
 {
-    //echo $paPoint;
     $mySQLStr = "UPDATE public.benhnhan " .
-        "SET hoten='" . $hoten . "', ngaysinh='" . $ngaysinh . "', diachi='" . $diachi . "', cccd='" . $cccd . "', tinhtrang='" . $tinhTrang . "', 'SRID=" . $paSRID . ";" . $paPoint . "'::geometry); " .
-        "WHERE id='" . $maBenhNhan . "';";
+        "SET hoten='" . $hoten .
+        "', ngaysinh='" . $ngaysinh .
+        "', diachi='" . $diachi .
+        "', cccd='" . $cccd .
+        "', tinhtrang='" . $tinhtrang .
+        "', geom='SRID=" . $paSRID . ";" . $paPoint . "'::geometry " .
+        "WHERE id='" . $mabenhnhan . "';";
     //echo $mySQLStr;
     try {
         $paPDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $result = $paPDO->prepare($mySQLStr);
         $result->execute();
-        return "done";
+        return "Đã sửa thành công bệnh nhân " . $mabenhnhan;
     } catch (PDOException $e) {
         echo "Thất bại, Lỗi: " . $e->getMessage();
         return null;
     }
 }
 
-function xoaBenhNhan($paPDO, $maBenhNhan)
+function xoaBenhNhan($paPDO, $mabenhnhan)
 {
-    //echo $paPoint;
-    $mySQLStr = "DELETE FROM \"benhnhan\" WHERE benhnhan.id = " . $maBenhNhan . ";";
-    //echo $mySQLStr;
+    $mySQLStr = 'DELETE FROM benhnhan WHERE benhnhan.id = ' . $mabenhnhan . ';';
     try {
         $paPDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $result = $paPDO->prepare($mySQLStr);
         $result->execute();
-        return "Đã xóa thành công bênh nhân ".$maBenhNhan;
+        return "Đã xóa thành công bệnh nhân " . $mabenhnhan;
     } catch (PDOException $e) {
         echo "Thất bại, Lỗi: " . $e->getMessage();
         return null;
