@@ -31,12 +31,12 @@
             <h3 class="text-center">Chọn Bản Đồ </h3>
             <form action="" method="GET" class="my-2">
                 <div class="input-group">
-                    <select name="style" class="custom-select ">
+                    <select id="style" name="style" class="custom-select ">
                         <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 0) ? "selected" : " " ?> value="0">polygon</option>
                         <option <?php echo (isset($_GET['style']) &&  $_GET['style'] == 1) ? "selected" : " " ?> value="1">line</option>
                     </select>
 
-                    <select name="layerview" class="custom-select ">
+                    <select id="layerview" name="layerview" class="custom-select ">
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 0) ? "selected" : " " ?> value="0">Việt Nam</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 1) ? "selected" : " " ?> value="1">Tỉnh/Thành Phố</option>
                         <option <?php echo (isset($_GET['layerview']) &&  $_GET['layerview'] == 2) ? "selected" : " " ?> value="2">Quận/Huyện</option>
@@ -118,6 +118,7 @@
             layerBG = new ol.layer.Tile({
                 source: new ol.source.OSM({})
             });
+
             var port = '8080';
             var workspaces = 'chaythu';
             var layerGADM_VNM = new ol.layer.Image({
@@ -132,15 +133,15 @@
                     }
                 })
             });
-            //console.log(makieu + ":" + layKieu(makieu) + "; " + malop + layLop(malop));
+
             var viewMap = new ol.View({
                 center: ol.proj.fromLonLat([mapLng, mapLat]),
                 zoom: mapDefaultZoom
                 //projection: projection
             });
-
             map = new ol.Map({
                 target: "map",
+                //layers: [layerBG],
                 //layers: [layerGADM_VNM],
                 layers: [layerBG, layerGADM_VNM],
                 view: viewMap
@@ -282,7 +283,7 @@
             }
 
             function hienThiViTriBenhNhan(checker) {
-                console.log(myPoint);
+                //console.log(myPoint);
                 if (checker == 1) {
                     loaiBenhNhan = document.getElementById("chonBenhNhan").value;
                     $.ajax({

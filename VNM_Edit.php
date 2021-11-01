@@ -323,9 +323,13 @@
                             document.getElementById("ngaysinh").value = objJson.ngaysinh;
                             document.getElementById("diachi").value = objJson.diachi;
                             document.getElementById("cccd").value = objJson.cccd;
-                            document.getElementById("lon").value = objJson.vitribenhnhan.coordinates[0];
-                            document.getElementById("lat").value = objJson.vitribenhnhan.coordinates[1];
-                            hienThiThongTin(objJson.vitribenhnhan.coordinates[0], objJson.vitribenhnhan.coordinates[1]);
+                            var lon = objJson.vitribenhnhan.coordinates[0];
+                            var lat = objJson.vitribenhnhan.coordinates[1];
+                            myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                            geoJsonPoint = '{"type":"Point", "coordinates":[' + lon + ',' + lat + ']}';
+                            document.getElementById("lon").value = lon;
+                            document.getElementById("lat").value = lat;
+                            hienThiThongTin();
                         }
                     },
                     error: function(req, status, error) {

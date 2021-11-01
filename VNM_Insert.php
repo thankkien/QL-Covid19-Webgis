@@ -152,7 +152,7 @@
                         paPoint: myPoint
                     },
                     success: function(result, status, erro) {
-                        console.log(result);
+                        //console.log(result);
                         alert(result);
                     },
                     error: function(req, status, error) {
